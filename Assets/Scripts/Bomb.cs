@@ -1,34 +1,33 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Bomb : MonoBehaviour
 {
-    [SerializeField] int _damage = 1;
-    [SerializeField] ParticleSystem _explosionPrefab;
-    [SerializeField] AudioClip _explosionSound;
+    [SerializeField] ParticleSystem _explosionParticlesPrefab;
+    [SerializeField] ParticleSystem _waterParticlesPrefab;
+    [SerializeField] AudioClip _explosionClip;
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (_explosionPrefab != null)
-            Instantiate(_explosionPrefab, collision.contacts[0].point, Quaternion.identity);
+        bool isWater = collision.gameObject.CompareTag("Water");
 
-        var enemy = collision.collider.GetComponent<EnemyController>();
-        if (enemy != null)
-            enemy.TakeDamage(_damage);
+        Instantiate(isWater ? _waterParticlesPrefab : _explosionParticlesPrefab, collision.GetContact(0).point, Quaternion.identity);
 
-        StartCoroutine(PlaySoundAndDie());
+        if (isWater)
+            Destroy(gameObject);
+        else
+            StartCoroutine(PlaySoundAndDie());
     }
 
     IEnumerator PlaySoundAndDie()
     {
+        GetComponent<SpriteRenderer>().enabled = false;
         GetComponent<Collider2D>().enabled = false;
-        GetComponent<Rigidbody2D>().simulated= false;
-        GetComponentInChildren<SpriteRenderer>().enabled = false;
-        
+        GetComponent<Rigidbody2D>().simulated = false;
+
         var audioSource = GetComponent<AudioSource>();
-        audioSource.PlayOneShot(_explosionSound);
+        audioSource.PlayOneShot(_explosionClip);
 
         yield return new WaitUntil(() => !audioSource.isPlaying);
 

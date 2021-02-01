@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Water
   layers:
   - Default
   - TransparentFX
@@ -12,10 +13,10 @@ TagManager:
   - Water
   - UI
   - Player
-  - Bomb
-  - Enemy
+  - PlayerProjectiles
+  - Islands
   - EnemyProjectiles
-  - 
+  - Bounds
   - 
   - 
   - 
@@ -38,27 +39,24 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 2610163687
+    locked: 0
+  - name: Water
+    uniqueID: 2469348355
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Background
-    uniqueID: 141641131
-    locked: 0
-  - name: Water
-    uniqueID: 1890558009
+  - name: Islands
+    uniqueID: 1312120379
     locked: 0
   - name: Player
-    uniqueID: 1773830265
-    locked: 0
-  - name: Bomb
-    uniqueID: 2960642181
-    locked: 0
-  - name: Enemies
-    uniqueID: 3392129375
+    uniqueID: 2454109529
     locked: 0
   - name: Particles
-    uniqueID: 3120634529
+    uniqueID: 4101127503
     locked: 0
   - name: UI
-    uniqueID: 2800072377
+    uniqueID: 4065585511
     locked: 0

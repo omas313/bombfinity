@@ -3,102 +3,107 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour, IHealth
+public class PlayerController : MonoBehaviour, ITakeHit, IHealth
 {
     public event Action<int, int> HealthChanged;
-    public event Action Ready;
     public event Action Died;
+    public event Action Ready;
 
-    [SerializeField] int _maxHealth = 10;
-    [SerializeField] float _moveSpeed = 10f;
-    [SerializeField] float _bombCooldown = 0.5f;
+    public float BombCooldown => _bombCooldown;
+
+    [SerializeField] int _maxHealth = 100;
+    [SerializeField] float _moveSpeed;
+    [SerializeField] float _deadZone = 0.1f;
+    [SerializeField] Bomb _bombPrefab;
     [SerializeField] Transform _launchPoint;
-    [SerializeField] GameObject _bombPrefab;
-    [SerializeField] GameObject _explosionPrefab;
-    [SerializeField] AudioClip _hitSound;
+    [SerializeField] float _bombCooldown = 3f;
+    [SerializeField] GameObject _deathParticles;
+    [SerializeField] AudioClip[] _hitSounds;
+    [SerializeField] AudioClip _deathClip;
 
-
-
-    Rigidbody2D _rigidbody;
-    Shield _shield;
+    bool CanFire => _bombCooldownTimer > _bombCooldown;
+    bool IsShieldActive => _shield.IsActive;
     float _xThrow;
     float _yThrow;
-
-    int _currentHealth;
-    float _bombTimer;
-    bool _isReady;
-
+    Rigidbody2D _rigidbody;
     AudioSource _audioSource;
+    Shield _shield;
+    float _bombCooldownTimer;
+    int _currentHealth;
 
-    public void TakeDamage(int damage)
+    public void TakeHit(int damage)
     {
-        if (_shield != null && _shield.IsActive)
+        if (IsShieldActive)
+        {
+            _shield.TakeHit(damage);
             return;
+        }
 
-        // Debug.Log("taking dmage");
-
+        PlayRandomHitSound();
         _currentHealth = Mathf.Max(_currentHealth - damage, 0);
         HealthChanged?.Invoke(_currentHealth, _maxHealth);
-        _audioSource.PlayOneShot(_hitSound);
 
-        if (_currentHealth == 0)
+        if (_currentHealth <= 0)
             Die();
     }
 
-    private void Die()
+    void PlayRandomHitSound()
     {
-        Debug.Log("player died");
+        _audioSource.PlayOneShot(_hitSounds[UnityEngine.Random.Range(0, _hitSounds.Length)]);
+    }
 
+    void Die()
+    {
+        Died?.Invoke();
+        if (_deathParticles != null)
+            Instantiate(_deathParticles, transform.position, Quaternion.identity);
+        
 
-        _rigidbody.simulated = false;
+        _audioSource.PlayOneShot(_deathClip);
         GetComponent<SpriteRenderer>().enabled = false;
         GetComponent<Collider2D>().enabled = false;
-
-        if (_explosionPrefab != null)
-            Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
-
-        Died?.Invoke();
+        GetComponent<Rigidbody2D>().simulated = false;
+        enabled = false;
     }
 
     void Awake()
     {
-        _rigidbody = GetComponent<Rigidbody2D>();
         _shield = GetComponentInChildren<Shield>();
         _audioSource = GetComponent<AudioSource>();
-
+        _rigidbody = GetComponent<Rigidbody2D>();        
+        _bombCooldownTimer = _bombCooldown;
         _currentHealth = _maxHealth;
-        HealthChanged?.Invoke(_currentHealth, _maxHealth);
     }
 
     void Update()
     {
-        if (!_isReady && Input.GetButtonDown("Ready"))
-        {
-            _isReady = true;
+        if (Input.GetKeyDown(KeyCode.Space))
             Ready?.Invoke();
-        }
 
         _xThrow = Input.GetAxis("Horizontal");
         _yThrow = Input.GetAxis("Vertical");
 
-        _bombTimer += Time.deltaTime;
+        _bombCooldownTimer += Time.deltaTime;
 
-        if (ShouldDropBomb())
+        if (Input.GetButtonDown("Fire1") && CanFire)
         {
-            DropBomb();
-            _bombTimer = 0f;
+            SpawnBomb();
+            _bombCooldownTimer = 0f;
         }
     }
 
-    private bool ShouldDropBomb() => Input.GetButtonDown("Fire1") && _bombTimer > _bombCooldown;
-
-    void DropBomb()
+    void SpawnBomb()
     {
         Instantiate(_bombPrefab, _launchPoint.position, Quaternion.identity);
     }
 
     void FixedUpdate()
     {
-        _rigidbody.velocity = new Vector2(_xThrow, _yThrow).normalized * _moveSpeed;    
+        if (Mathf.Abs(_xThrow) < _deadZone)
+            _xThrow = 0f;
+        if (Mathf.Abs(_yThrow) < _deadZone)
+            _yThrow = 0f;
+
+        _rigidbody.velocity = new Vector2(_xThrow, _yThrow).normalized * _moveSpeed;
     }
 }

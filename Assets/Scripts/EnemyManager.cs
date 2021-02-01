@@ -5,61 +5,85 @@ using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
 {
+    public static EnemyManager Instance { get; private set;}
+
     public event Action<int> EnemyDestroyed;
-    public event Action AllEnemiedDestroyed;
+    public event Action AllEnemiesDestroyed;
 
-    [SerializeField] EnemyController _enemyPrefab;
-    [SerializeField] Collider2D _spawnAreaCollider;
     [SerializeField] Transform _parent;
+    [SerializeField] Island _enemyPrefab;
 
-    int _totalEnemyCount;
+    BoxCollider2D _collider;
 
-    void Start()
+    int _currentEnemyCount;
+
+
+    int __level = 1;
+    [ContextMenu("increment")]
+    public void IncrementLevelAndSPawn()
     {
+        __level++;
+        SpawnEnemiess();
     }
 
-    void SpawnEnemy(int level)
+    [ContextMenu("spawn enemies")]
+    public void SpawnEnemiess()
     {
-        var position = GetRandomSpawnPosition();
-        var enemy = Instantiate(_enemyPrefab, position, Quaternion.identity, _parent).GetComponent<EnemyController>();
-        enemy.SetStats(level);
-        enemy.Destroyed += OnEnemyDestroyed;
-        _totalEnemyCount++;
+        foreach (var enemy in FindObjectsOfType<Island>())
+            Destroy(enemy.gameObject);
+
+        SpawnEnemiesForLevel(__level);
     }
 
     public void SpawnEnemiesForLevel(int level)
     {
-        var count = level + (int)Math.Floor(level * 1.5f);
+        var count = level + (int)Math.Floor(Math.Sqrt(level) * 0.25f);
+        StartCoroutine(SpawnEnemiesWithDelay(level, count));
+    }
+
+    IEnumerator SpawnEnemiesWithDelay(int level, int count)
+    {
         for (int i = 0; i < count; i++)
+        {
+            yield return new WaitForSeconds(UnityEngine.Random.Range(0.1f, 0.3f));
             SpawnEnemy(level);
+        }
     }
 
-    private Vector3 GetRandomSpawnPosition() => new Vector3(
-            UnityEngine.Random.Range(_spawnAreaCollider.bounds.min.x, _spawnAreaCollider.bounds.max.x),
-            UnityEngine.Random.Range(_spawnAreaCollider.bounds.min.y, _spawnAreaCollider.bounds.max.y),
-            0f);
-
-    void OnEnemyDestroyed(int score)
+    void Awake()
     {
-        _totalEnemyCount--;
-        EnemyDestroyed?.Invoke(score);
-
-        if (_totalEnemyCount <= 0)
-            AllEnemiedDestroyed?.Invoke();
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);    
     }
 
-    [ContextMenu("spawn enemies 1")]
-    void SpawnEnemyTest()
+    void Start()
     {
-        SpawnEnemiesForLevel(1);
+        _collider = GetComponent<BoxCollider2D>();
     }
 
-    [ContextMenu("spawn enemies 5")]
-    void SpawnEnemyTest2()
+    void SpawnEnemy(int level)
     {
-        foreach(var enemy in FindObjectsOfType<EnemyController>())
-            Destroy(enemy.gameObject);
+        var position = new Vector2(
+            UnityEngine.Random.Range(_collider.bounds.min.x, _collider.bounds.max.x),
+            UnityEngine.Random.Range(_collider.bounds.min.y, _collider.bounds.max.y)
+        );
 
-        SpawnEnemiesForLevel(5);
+        var enemy = Instantiate(_enemyPrefab, position, Quaternion.identity, _parent).GetComponent<Island>();
+        enemy.SetStats(level);
+        enemy.Destroyed += OnEnemyDestroyed;
+        _currentEnemyCount++;
     }
+
+    void OnEnemyDestroyed(Island enemy)
+    {
+        EnemyDestroyed?.Invoke(enemy.KillScore);
+        enemy.Destroyed -= OnEnemyDestroyed;
+        _currentEnemyCount--;
+
+        if (_currentEnemyCount <= 0)
+            AllEnemiesDestroyed?.Invoke();
+    }
+
 }

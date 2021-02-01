@@ -6,59 +6,59 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
-    public event Action<int> LevelStarted;
 
     public static LevelManager Instance { get; private set;}
 
+    public event Action<int> LevelStarted;
+    public event Action<int> LevelCompleted;
     public int CurrentLevel { get; private set; }
 
-
-    EnemyManager _enemyManager;
+    bool _isWaitingForLevelStart = true;
 
     void Awake()
     {
         if (Instance == null)
             Instance = this;
         else
-            Destroy(gameObject);
+            Destroy(gameObject);    
     }
 
     void Start()
     {
-        _enemyManager = FindObjectOfType<EnemyManager>();
-        _enemyManager.AllEnemiedDestroyed += OnAllEnemiesDestroyed;
-
-        FindObjectOfType<PlayerController>().Ready += OnPlayerReady;
-        FindObjectOfType<PlayerController>().Died += OnPlayerDied;
+        var player = FindObjectOfType<PlayerController>();
+        player.Ready += OnPlayerReady;
+        player.Died += OnPlayerDied;
+        EnemyManager.Instance.AllEnemiesDestroyed += OnAllEnemiesDestroyed;    
     }
 
-    private void OnPlayerDied()
+    void OnPlayerDied()
     {
-        StartCoroutine(LoadMainMenuAfterDelay());
+        StartCoroutine(LoadSceneAfterSeconds(3f));
     }
-
-    IEnumerator LoadMainMenuAfterDelay()
+    IEnumerator LoadSceneAfterSeconds(float delay)
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(delay);
         SceneManager.LoadScene(0);
     }
 
     void OnPlayerReady()
     {
-        StartLevel(++CurrentLevel);
+        if (_isWaitingForLevelStart)
+            StartNewLevel(++CurrentLevel);
     }
 
-    void OnAllEnemiesDestroyed() => StartCoroutine(StartLevelAfterDelay());
-
-    IEnumerator StartLevelAfterDelay()
+    void OnAllEnemiesDestroyed()
     {
-        yield return new WaitForSeconds(1f);
-        StartLevel(++CurrentLevel);
+        _isWaitingForLevelStart = true;
+        LevelCompleted?.Invoke(CurrentLevel);
+        StartNewLevel(++CurrentLevel);
     }
 
-    void StartLevel(int level)
+    void StartNewLevel(int level)
     {
         LevelStarted?.Invoke(level);
-        _enemyManager.SpawnEnemiesForLevel(level);
+        _isWaitingForLevelStart = false;
+        EnemyManager.Instance.SpawnEnemiesForLevel(level);
     }
 }
+

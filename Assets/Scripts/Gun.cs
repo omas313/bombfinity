@@ -5,68 +5,78 @@ using UnityEngine;
 
 public class Gun : MonoBehaviour
 {
-    [SerializeField] int _damage = 1;
+    [SerializeField] float _shootRate = 2f;
+    [SerializeField] int _damagePerShot = 1;
     [SerializeField] float _aimSpeed = 1f;
+    [SerializeField] [Range(3f, 15f)] float _bulletSpeed = 3f;
 
-    Transform _playerTransform;
+    public int KillScore => (int)Mathf.Ceil(_damagePerShot * _shootRate);
+
     ParticleSystem _particleSystem;
-
-    public int Score => CalculateScore();
-
-
-    public void SetStats(int level)
-    {
-        _damage = UnityEngine.Random.Range(1, level);
-        _aimSpeed = UnityEngine.Random.Range(1, level);
-
-        var main = _particleSystem.main;
-        main.startSpeed = Mathf.Clamp(UnityEngine.Random.Range(2f, level), 2f, 15f);
-    }
+    private Transform _playerTransform;
 
     public void Release()
     {
         transform.parent = null;
         GetComponentInChildren<SpriteRenderer>().enabled = false;
-
-        StartCoroutine(DestroyAfterRelease());
+        _particleSystem.Stop();
+        StartCoroutine(DestroyAfterParticlesAreDead());
     }
 
-    IEnumerator DestroyAfterRelease()
+    IEnumerator DestroyAfterParticlesAreDead()
     {
-        var emission = _particleSystem.emission;
-        emission.rateOverTime = 0f;
-
         yield return new WaitUntil(() => _particleSystem.particleCount == 0);
         Destroy(gameObject);
     }
 
-    int CalculateScore() => (int)Math.Ceiling(2 * _damage + _aimSpeed);
-
-    void Awake()
+    public void SetStats(int level)
     {
-        GetComponentInChildren<GunParticlesCollisionHandler>().HitPlayer += OnPlayerHit;
-        _particleSystem = GetComponentInChildren<ParticleSystem>();
+        _shootRate = UnityEngine.Random.Range(0.5f, level * 0.25f);
+        _damagePerShot = UnityEngine.Random.Range(1, (int)(level * 0.25f));
+        _aimSpeed = UnityEngine.Random.Range(0.5f, level * 0.5f);
+        _bulletSpeed = Mathf.Clamp(UnityEngine.Random.Range(3f, 3f + level * 0.5f), 3f, 20f);
+
+        InitParticleSystem();
     }
-    
+
     void Start()
     {
         _playerTransform = FindObjectOfType<PlayerController>().transform;
+        GetComponentInChildren<ParticleCollisionEventHandler>().Collided += OnCollided;
     }
 
-    void OnPlayerHit(PlayerController player)
+    void InitParticleSystem()
     {
-        player.TakeDamage(_damage);
+        _particleSystem = GetComponentInChildren<ParticleSystem>();
+
+        var emission = _particleSystem.emission;
+        emission.rateOverTime = _shootRate;
+
+        var main = _particleSystem.main;
+        main.startSpeed = _bulletSpeed;
+        main.startLifetime = 10f / _bulletSpeed + 10f;
+        main.startSize = Mathf.Clamp(UnityEngine.Random.Range(0.1f, _damagePerShot * 0.25f), 0.1f, 0.3f);
     }
 
-    void Update()
+    private void Update()
     {
-        RotateToFacePlayer();        
+        RotateTowardsPlayer();
     }
 
-    void RotateToFacePlayer()
+    void RotateTowardsPlayer()
     {
+        if (_playerTransform == null)
+            return;
+            
         var vectorToPlayer = (_playerTransform.position - transform.position).normalized;
         var angle = Vector2.SignedAngle(Vector2.up, vectorToPlayer);
-        transform.localRotation = Quaternion.Lerp(transform.localRotation, Quaternion.Euler(new Vector3(0f, 0f, angle)), _aimSpeed * Time.deltaTime);
+        transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.Euler(0f, 0f, angle), _aimSpeed * Time.deltaTime);
+    }
+
+    void OnCollided(GameObject other)
+    {
+        var hitTaker = other.GetComponentInChildren<ITakeHit>();
+        if (hitTaker != null)
+            hitTaker.TakeHit(_damagePerShot);
     }
 }
