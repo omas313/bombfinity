@@ -5,15 +5,22 @@ using UnityEngine;
 
 public class Gun : MonoBehaviour
 {
-    [SerializeField] float _shootRate = 2f;
-    [SerializeField] int _damagePerShot = 1;
-    [SerializeField] float _aimSpeed = 1f;
-    [SerializeField] [Range(3f, 15f)] float _bulletSpeed = 3f;
-
     public int KillScore => (int)Mathf.Ceil(_damagePerShot * _shootRate);
 
+    float _shootRate = 2f;
+    int _damagePerShot = 1;
+    float _aimSpeed = 1f;
+    float _bulletSpeed = 3f;
+
+    float _reloadPeriod = 5f;
+    float _reloadTime = 3f;
+    float _reloadTimer;
+    bool _isReloading;
+
+
     ParticleSystem _particleSystem;
-    private Transform _playerTransform;
+    Transform _playerTransform;
+    Animation _animation;
 
     public void Release()
     {
@@ -35,12 +42,16 @@ public class Gun : MonoBehaviour
         _damagePerShot = UnityEngine.Random.Range(1, (int)(level * 0.25f));
         _aimSpeed = UnityEngine.Random.Range(0.5f, level * 0.5f);
         _bulletSpeed = Mathf.Clamp(UnityEngine.Random.Range(3f, 3f + level * 0.5f), 3f, 20f);
+        _reloadPeriod = UnityEngine.Random.Range(6f - _damagePerShot, 6f + _damagePerShot);
+        _reloadTime = UnityEngine.Random.Range(2f, 2f + _shootRate);
+        _reloadTimer = UnityEngine.Random.value > 0.5 ? _reloadTime : 0f;
 
         InitParticleSystem();
     }
 
     void Start()
     {
+        _animation = GetComponent<Animation>();
         _playerTransform = FindObjectOfType<PlayerController>().transform;
         GetComponentInChildren<ParticleCollisionEventHandler>().Collided += OnCollided;
     }
@@ -60,12 +71,35 @@ public class Gun : MonoBehaviour
 
     private void Update()
     {
+        HandleReload();
         RotateTowardsPlayer();
+    }
+
+    void HandleReload()
+    {
+        if (_isReloading)
+            return;
+
+        _reloadTimer += Time.deltaTime;
+
+        if (_reloadTimer > _reloadPeriod)
+            StartCoroutine(Reload());    
+    }
+
+    IEnumerator Reload()
+    {
+        _isReloading = true;
+        _reloadTimer = 0f;
+        _particleSystem.Stop();
+        _animation.Play();
+        yield return new WaitForSeconds(_reloadTime);
+        _isReloading = false;
+        _particleSystem.Play();
     }
 
     void RotateTowardsPlayer()
     {
-        if (_playerTransform == null)
+        if (_playerTransform == null || _isReloading)
             return;
             
         var vectorToPlayer = (_playerTransform.position - transform.position).normalized;

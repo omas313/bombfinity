@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2690847970983735018}
   - component: {fileID: 2690847970983735017}
+  - component: {fileID: 2248775537133321281}
   m_Layer: 8
   m_Name: Gun
   m_TagString: Untagged
@@ -45,10 +46,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711b34f3ae18fd84f99afd3d762c680c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _shootRate: 2
-  _damagePerShot: 1
-  _aimSpeed: 1
-  _bulletSpeed: 3
+--- !u!111 &2248775537133321281
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2690847970983735019}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: e478494232293e34eb15e79d98f43eb2, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: e478494232293e34eb15e79d98f43eb2, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!1 &2690847971758996742
 GameObject:
   m_ObjectHideFlags: 0
