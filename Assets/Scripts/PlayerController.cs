@@ -47,6 +47,12 @@ public class PlayerController : MonoBehaviour, ITakeHit, IHealth
             Die();
     }
 
+    public void AddHealth(int amount)
+    {
+        _currentHealth = Mathf.Min(_currentHealth + amount, _maxHealth);
+        HealthChanged?.Invoke(_currentHealth, _maxHealth);
+    }
+
     void PlayRandomHitSound()
     {
         _audioSource.PlayOneShot(_hitSounds[UnityEngine.Random.Range(0, _hitSounds.Length)]);

@@ -17,7 +17,7 @@ TagManager:
   - Islands
   - EnemyProjectiles
   - Bounds
-  - 
+  - Pickups
   - 
   - 
   - 
@@ -56,6 +56,9 @@ TagManager:
     locked: 0
   - name: Particles
     uniqueID: 4101127503
+    locked: 0
+  - name: Pickups
+    uniqueID: 2197307553
     locked: 0
   - name: UI
     uniqueID: 4065585511

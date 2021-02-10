@@ -121,7 +121,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _explosionParticlesPrefab: {fileID: 5485793116299677, guid: b09d449194450b64386ffe56072ff021, type: 3}
   _waterParticlesPrefab: {fileID: 3494440755205126196, guid: 2f19d431d7f68a446afab6d0e57192fc, type: 3}
-  _explosionClip: {fileID: 8300000, guid: 03fa0d46470079643b78ef771dcb8c7a, type: 3}
+  _explosionClip: {fileID: 8300000, guid: cf26f7741e9c9e44c9f431e473b23e77, type: 3}
+  _waterHitClip: {fileID: 8300000, guid: 958eaa51508e6a546a7d76cc2ca78766, type: 3}
 --- !u!70 &8538998775541544179
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
