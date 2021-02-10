@@ -47,6 +47,7 @@ public class Gun : MonoBehaviour
     
     IEnumerator DestroyAfterParticlesAreDead()
     {
+        _particleSystem.Stop();
         yield return new WaitUntil(() => _particleSystem.particleCount == 0);
         Destroy(gameObject);
     }

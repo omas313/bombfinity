@@ -10,7 +10,6 @@ public class Island : MonoBehaviour, IHealth
     public event Action<int, int> HealthChanged;
     public int KillScore => _maxHealth + GetComponentInChildren<Gun>().KillScore;
 
-
     [SerializeField] int _maxHealth = 3;
     [SerializeField] GameObject _gunPrefab;
     [SerializeField] Collider2D _gunArea;
@@ -62,8 +61,17 @@ public class Island : MonoBehaviour, IHealth
         HealthChanged?.Invoke(_currentHealth, _maxHealth);
 
         if (_currentHealth <= 0)
+        {
             Die();
+            return;
+        }
+
+        var guns = GetComponentsInChildren<Gun>();
+        if (guns.Length > 1 && _maxHealth > 2 && _currentHealth <= _maxHealth / 2)
+            DestroyOneGun(guns);
     }
+
+    void DestroyOneGun(Gun[] guns) => guns[UnityEngine.Random.Range(0, guns.Length)].Release();
 
     void Die()
     {
