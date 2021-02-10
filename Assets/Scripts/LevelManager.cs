@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
-
     public static LevelManager Instance { get; private set;}
 
     public event Action<int> LevelStarted;
@@ -52,6 +51,8 @@ public class LevelManager : MonoBehaviour
     {
         _isWaitingForLevelStart = true;
         LevelCompleted?.Invoke(CurrentLevel);
+        GameCanvasTextManager.Instance.UpdateScore(CurrentLevel);
+
         StartNewLevel(++CurrentLevel);
     }
 
@@ -59,6 +60,12 @@ public class LevelManager : MonoBehaviour
     {
         LevelStarted?.Invoke(level);
         _isWaitingForLevelStart = false;
+        StartCoroutine(ShowUIAndSpawnEnemies(level));
+    }
+
+    IEnumerator ShowUIAndSpawnEnemies(int level)
+    {
+        yield return GameCanvasTextManager.Instance.ShowPopup($"Level {level}");
         EnemyManager.Instance.SpawnEnemiesForLevel(level);
     }
 }

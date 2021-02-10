@@ -6,12 +6,34 @@ using System;
 
 public class GameCanvasTextManager : MonoBehaviour
 {
+    public static GameCanvasTextManager Instance { get; private set;}
+
     [SerializeField] GameObject _instructions;
     [SerializeField] TextMeshProUGUI _youDiedText;
     [SerializeField] TextMeshProUGUI _scoreText;
     [SerializeField] TextMeshProUGUI _levelText;
+    [SerializeField] PopUpTextPanel _popupLevelText;
 
     int _score;
+
+    public IEnumerator ShowPopup(string text)
+    {
+        yield return _popupLevelText.EnterWithText(text);
+    }
+
+    public void UpdateScore(int level)
+    {
+        _score += level * 10;
+        _scoreText.SetText(_score.ToString());
+    }
+
+    void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);    
+    }
 
     void Start()
     {
@@ -22,8 +44,6 @@ public class GameCanvasTextManager : MonoBehaviour
         player.Ready += OnPlayerReady;
 
         EnemyManager.Instance.EnemyDestroyed += OnEnemyDestroyed;   
-        LevelManager.Instance.LevelCompleted += OnLevelCompleted;
-        LevelManager.Instance.LevelStarted += OnLevelStarted;
     }
 
     void OnPlayerReady()
@@ -36,17 +56,6 @@ public class GameCanvasTextManager : MonoBehaviour
     {
         _youDiedText.gameObject.SetActive(true);
         SaveHighScore();
-    }
-
-    void OnLevelCompleted(int level)
-    {
-        _score += level * 10;
-        _scoreText.SetText(_score.ToString());
-    }
-
-    void OnLevelStarted(int level)
-    {
-        _levelText.SetText(level.ToString());
     }
 
     void OnEnemyDestroyed(int points)
