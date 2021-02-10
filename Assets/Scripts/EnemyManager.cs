@@ -38,6 +38,10 @@ public class EnemyManager : MonoBehaviour
     public void SpawnEnemiesForLevel(int level)
     {
         var count = level + (int)Math.Floor(Math.Sqrt(level) * 0.25f);
+
+        if (level <= 3)
+            count += 1;
+
         StartCoroutine(SpawnEnemiesWithDelay(level, count));
     }
 
