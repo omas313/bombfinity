@@ -28,8 +28,12 @@ public class Gun : MonoBehaviour
     {
         transform.parent = null;
         GetComponentInChildren<SpriteRenderer>().enabled = false;
+
+        var emission = _particleSystem.emission;
+        emission.rateOverTime = 0f;
         _particleSystem.Stop();
-        StartCoroutine(DestroyAfterParticlesAreDead());
+
+        StartCoroutine(DestroyAfterSeconds(5f));
     }
 
     public void SetStats(int level)
@@ -45,10 +49,9 @@ public class Gun : MonoBehaviour
         GetComponentInChildren<ParticleCollisionEventHandler>().Collided += OnCollided;
     }
     
-    IEnumerator DestroyAfterParticlesAreDead()
+    IEnumerator DestroyAfterSeconds(float seconds)
     {
-        _particleSystem.Stop();
-        yield return new WaitUntil(() => _particleSystem.particleCount == 0);
+        yield return new WaitForSeconds(seconds);
         Destroy(gameObject);
     }
 
