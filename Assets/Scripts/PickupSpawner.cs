@@ -12,7 +12,7 @@ public class PickupSpawner : MonoBehaviour
     [SerializeField] float _spawnPeriod = 20f;
 
     Collider2D _collider;
-    public float _timer;
+    float _timer;
 
     bool _isActivated;
 
