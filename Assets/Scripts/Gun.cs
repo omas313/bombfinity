@@ -17,6 +17,8 @@ public class Gun : MonoBehaviour
     float _reloadTimer;
     bool _isReloading;
 
+    float _angleRange = 45f;
+    bool _isPlayerOutOfRange;
 
     ParticleSystem _particleSystem;
     Transform _playerTransform;
@@ -30,22 +32,9 @@ public class Gun : MonoBehaviour
         StartCoroutine(DestroyAfterParticlesAreDead());
     }
 
-    IEnumerator DestroyAfterParticlesAreDead()
-    {
-        yield return new WaitUntil(() => _particleSystem.particleCount == 0);
-        Destroy(gameObject);
-    }
-
     public void SetStats(int level)
     {
-        _shootRate = UnityEngine.Random.Range(0.5f, level * 0.25f);
-        _damagePerShot = UnityEngine.Random.Range(1, (int)(level * 0.25f));
-        _aimSpeed = UnityEngine.Random.Range(0.5f, level * 0.5f);
-        _bulletSpeed = Mathf.Clamp(UnityEngine.Random.Range(3f, 3f + level * 0.5f), 3f, 20f);
-        _reloadPeriod = UnityEngine.Random.Range(6f - _damagePerShot, 6f + _damagePerShot);
-        _reloadTime = UnityEngine.Random.Range(2f, 2f + _shootRate);
-        _reloadTimer = UnityEngine.Random.value > 0.5 ? _reloadTime : 0f;
-
+        SetRandomStats(level);
         InitParticleSystem();
     }
 
@@ -55,6 +44,25 @@ public class Gun : MonoBehaviour
         _playerTransform = FindObjectOfType<PlayerController>().transform;
         GetComponentInChildren<ParticleCollisionEventHandler>().Collided += OnCollided;
     }
+    
+    IEnumerator DestroyAfterParticlesAreDead()
+    {
+        yield return new WaitUntil(() => _particleSystem.particleCount == 0);
+        Destroy(gameObject);
+    }
+
+    void SetRandomStats(int level)
+    {
+        _shootRate = UnityEngine.Random.Range(0.5f, level * 0.25f);
+        _damagePerShot = UnityEngine.Random.Range(1, (int)(level * 0.25f));
+        _aimSpeed = UnityEngine.Random.Range(0.5f, level * 0.5f);
+        _bulletSpeed = Mathf.Clamp(UnityEngine.Random.Range(3f, 3f + level * 0.5f), 3f, 20f);
+        _reloadPeriod = UnityEngine.Random.Range(6f - _damagePerShot, 6f + _damagePerShot);
+        _reloadTime = UnityEngine.Random.Range(2f, 2f + _shootRate);
+        _reloadTimer = UnityEngine.Random.value > 0.5 ? _reloadTime : 0f;
+        _angleRange = level == 1 ? 45f : 45f + Mathf.Log10(level) * 20f;
+    }
+
 
     void InitParticleSystem()
     {
@@ -104,6 +112,15 @@ public class Gun : MonoBehaviour
             
         var vectorToPlayer = (_playerTransform.position - transform.position).normalized;
         var angle = Vector2.SignedAngle(Vector2.up, vectorToPlayer);
+
+        if (Mathf.Abs(angle) > _angleRange)
+        {
+            angle = _angleRange * Mathf.Sign(angle);
+            _isPlayerOutOfRange = true;
+        }
+        else
+            _isPlayerOutOfRange = false;
+
         transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.Euler(0f, 0f, angle), _aimSpeed * Time.deltaTime);
     }
 
