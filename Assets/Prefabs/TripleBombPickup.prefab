@@ -210,6 +210,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f67d2c512c72fe145a9728b1ab37dd35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pickupText: Triple Bombs
   _pickupSoundClip: {fileID: 8300000, guid: 99b290fe90f641c44addd654c12e1271, type: 3}
   _chanceToSpawn: 0.4
   _lifetime: 6

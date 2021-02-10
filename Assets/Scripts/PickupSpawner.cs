@@ -1,11 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PickupSpawner : MonoBehaviour
 {
-    // event for which powerup spawned to show popup
+    public event Action<Pickup> PickupSpawned;
 
     [SerializeField] Pickup[] _pickupsPrefabs;
     [SerializeField] int _levelToStartSpawning = 1;
@@ -52,7 +50,8 @@ public class PickupSpawner : MonoBehaviour
         if (UnityEngine.Random.value < pickupPrefab.ChanceToSpawn)
             return;
 
-        Instantiate(pickupPrefab, GetRandomPosition(), Quaternion.identity);    
+        Pickup pickup = Instantiate(pickupPrefab, GetRandomPosition(), Quaternion.identity);
+        PickupSpawned?.Invoke(pickup);
     }
 
     Vector3 GetRandomPosition() => new Vector3(

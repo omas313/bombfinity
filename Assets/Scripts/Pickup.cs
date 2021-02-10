@@ -5,11 +5,15 @@ using UnityEngine;
 
 public abstract class Pickup : MonoBehaviour
 {
+    public event Action<Pickup> PickedUp;
+    public event Action<Pickup> Destroyed;
+
     public float ChanceToSpawn => _chanceToSpawn;
+    public string PickupText => pickupText;
 
     protected AudioSource audioSource;
-    protected abstract void ActivateEffect();
 
+    [SerializeField] protected string pickupText;
     [SerializeField] AudioClip _pickupSoundClip;
     [SerializeField] float _chanceToSpawn;
     [SerializeField] float _lifetime = 5f;
@@ -17,6 +21,7 @@ public abstract class Pickup : MonoBehaviour
     float _timer;
     bool _hasBeenActivated;
 
+    protected abstract void ActivateEffect();
     protected virtual void DisableSelf()
     {
         GetComponent<Collider2D>().enabled = false;
@@ -24,7 +29,7 @@ public abstract class Pickup : MonoBehaviour
 
         var particles = GetComponentInChildren<ParticleSystem>();
         if (particles != null)
-            particles.Stop();
+            particles.Stop();        
     }
 
     void Awake()
@@ -43,13 +48,13 @@ public abstract class Pickup : MonoBehaviour
             DisableSelf();
     }
 
-
     void OnTriggerEnter2D(Collider2D other)
     {
         _hasBeenActivated = true;
         DisableSelf();
         PlayPickupSound();
         ActivateEffect();
+        PickedUp?.Invoke(this);
     }
 
     void PlayPickupSound()
@@ -58,5 +63,10 @@ public abstract class Pickup : MonoBehaviour
             audioSource = GetComponent<AudioSource>();    
 
         audioSource.PlayOneShot(_pickupSoundClip);
+    }
+
+    void OnDestroy()
+    {
+        Destroyed?.Invoke(this);
     }
 }

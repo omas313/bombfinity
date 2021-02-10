@@ -37,6 +37,7 @@ public class GameCanvasTextManager : MonoBehaviour
 
     void Start()
     {
+        _instructions.SetActive(true);
         _youDiedText.gameObject.SetActive(false);
 
         var player = FindObjectOfType<PlayerController>();

@@ -27,8 +27,6 @@ public class Shield : MonoBehaviour, ITakeHit
         _animator?.SetTrigger("Flash");
     }
 
-
-    
     void Activate()
     {
         _collider.enabled = true;

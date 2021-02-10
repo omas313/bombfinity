@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour, ITakeHit, IHealth
     [SerializeField] AudioClip[] _hitSounds;
     [SerializeField] AudioClip _deathClip;
 
-    bool CanFire => _bombCooldownTimer > _bombCooldown;
+    bool CanFire => _bombCooldownTimer > _bombCooldown && LevelManager.Instance.GameStarted;
     bool IsShieldActive => _shield.IsActive;
     float _xThrow;
     float _yThrow;
@@ -65,7 +65,6 @@ public class PlayerController : MonoBehaviour, ITakeHit, IHealth
         if (_deathParticles != null)
             Instantiate(_deathParticles, transform.position, Quaternion.identity);
         
-
         _audioSource.PlayOneShot(_deathClip);
         GetComponent<SpriteRenderer>().enabled = false;
         GetComponent<Collider2D>().enabled = false;
@@ -84,15 +83,18 @@ public class PlayerController : MonoBehaviour, ITakeHit, IHealth
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (!LevelManager.Instance.GameStarted && Input.GetKeyDown(KeyCode.Space))
+        {
             Ready?.Invoke();
+            return;
+        }
 
         _xThrow = Input.GetAxis("Horizontal");
         _yThrow = Input.GetAxis("Vertical");
 
         _bombCooldownTimer += Time.deltaTime;
 
-        if (Input.GetButtonDown("Fire1") && CanFire)
+        if (Input.GetKeyDown(KeyCode.Space) && CanFire)
         {
             SpawnBomb();
             _bombCooldownTimer = 0f;

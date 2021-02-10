@@ -5014,6 +5014,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b5669393d579dd4fa61e8cb6adb5ee1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pickupText: '+3 Health '
   _pickupSoundClip: {fileID: 8300000, guid: c0c1a3586a067d841b0b7b757f1a5c1d, type: 3}
   _chanceToSpawn: 0.8
   _lifetime: 8
