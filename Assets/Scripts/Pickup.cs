@@ -7,18 +7,17 @@ public abstract class Pickup : MonoBehaviour
 {
     public float ChanceToSpawn => _chanceToSpawn;
 
-    [SerializeField] AudioClip _pickupSoundClip;
-    [SerializeField] float _chanceToSpawn;
-
     protected AudioSource audioSource;
     protected abstract void ActivateEffect();
 
-    void Awake()
-    {
-        audioSource = GetComponent<AudioSource>();    
-    }
+    [SerializeField] AudioClip _pickupSoundClip;
+    [SerializeField] float _chanceToSpawn;
+    [SerializeField] float _lifetime = 5f;
 
-    void OnTriggerEnter2D(Collider2D other)
+    float _timer;
+    bool _hasBeenActivated;
+
+    protected virtual void DisableSelf()
     {
         GetComponent<Collider2D>().enabled = false;
         GetComponent<SpriteRenderer>().enabled = false;
@@ -26,7 +25,29 @@ public abstract class Pickup : MonoBehaviour
         var particles = GetComponentInChildren<ParticleSystem>();
         if (particles != null)
             particles.Stop();
+    }
 
+    void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();    
+    }
+
+    void Update()
+    {
+        if (_hasBeenActivated)
+            return;
+            
+        _timer += Time.deltaTime;
+
+        if (_timer > _lifetime)
+            DisableSelf();
+    }
+
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        _hasBeenActivated = true;
+        DisableSelf();
         PlayPickupSound();
         ActivateEffect();
     }

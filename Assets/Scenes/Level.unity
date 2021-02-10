@@ -2227,7 +2227,7 @@ MonoBehaviour:
   - {fileID: 6450646846828569780, guid: e349751b6e9b62945ae40526f0c663db, type: 3}
   - {fileID: 1132101946860863835, guid: e951fdebc9ab3f5428ad22134a6d829e, type: 3}
   _levelToStartSpawning: 1
-  _spawnPeriod: 20
+  _spawnPeriod: 5
   _timer: 0
 --- !u!61 &1423962866
 BoxCollider2D:
