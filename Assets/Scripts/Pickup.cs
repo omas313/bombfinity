@@ -5,7 +5,10 @@ using UnityEngine;
 
 public abstract class Pickup : MonoBehaviour
 {
+    public float ChanceToSpawn => _chanceToSpawn;
+
     [SerializeField] AudioClip _pickupSoundClip;
+    [SerializeField] float _chanceToSpawn;
 
     protected AudioSource audioSource;
     protected abstract void ActivateEffect();
@@ -26,6 +29,9 @@ public abstract class Pickup : MonoBehaviour
 
     void PlayPickupSound()
     {
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();    
+            
         audioSource.PlayOneShot(_pickupSoundClip);
     }
 }

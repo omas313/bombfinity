@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour, ITakeHit, IHealth
 {
     public event Action<int, int> HealthChanged;
+    public event Action<Vector3> BombSpawned;
     public event Action Died;
     public event Action Ready;
 
@@ -101,6 +102,7 @@ public class PlayerController : MonoBehaviour, ITakeHit, IHealth
     void SpawnBomb()
     {
         Instantiate(_bombPrefab, _launchPoint.position, Quaternion.identity);
+        BombSpawned?.Invoke(_launchPoint.position);
     }
 
     void FixedUpdate()

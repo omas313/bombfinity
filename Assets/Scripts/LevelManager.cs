@@ -12,6 +12,7 @@ public class LevelManager : MonoBehaviour
     public event Action<int> LevelStarted;
     public event Action<int> LevelCompleted;
     public int CurrentLevel { get; private set; }
+    public bool GameStarted => !_isWaitingForLevelStart;
 
     bool _isWaitingForLevelStart = true;
 
