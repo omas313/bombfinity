@@ -7,6 +7,6 @@ public class HealthPickup : Pickup
     protected override void ActivateEffect()
     {
         FindObjectOfType<PlayerController>().AddHealth(_healthToAdd);
-        Destroy(gameObject);
+        Destroy(gameObject, 1f);
     }
 }

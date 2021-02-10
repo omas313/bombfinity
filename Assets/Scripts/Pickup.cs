@@ -23,6 +23,10 @@ public abstract class Pickup : MonoBehaviour
         GetComponent<Collider2D>().enabled = false;
         GetComponent<SpriteRenderer>().enabled = false;
 
+        var particles = GetComponentInChildren<ParticleSystem>();
+        if (particles != null)
+            particles.Stop();
+
         PlayPickupSound();
         ActivateEffect();
     }
@@ -31,7 +35,7 @@ public abstract class Pickup : MonoBehaviour
     {
         if (audioSource == null)
             audioSource = GetComponent<AudioSource>();    
-            
+
         audioSource.PlayOneShot(_pickupSoundClip);
     }
 }
