@@ -4,11 +4,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using System;
+using UnityEngine.UI;
 
 public class MainMenuController : MonoBehaviour
 {
     [SerializeField] CanvasGroup _highScoreGroup;
     [SerializeField] TextMeshProUGUI _highScoreText;
+    [SerializeField] TextMeshProUGUI _spaceToStart;
+    [SerializeField] Button _startGameButton;
 
     bool _isLoading;
 
@@ -23,6 +26,7 @@ public class MainMenuController : MonoBehaviour
 
     IEnumerator LoadGameAfterSeconds(float delay)
     {
+        _spaceToStart.gameObject.SetActive(false);
         yield return new WaitForSeconds(delay);
         SceneManager.LoadSceneAsync(1);
     }
@@ -30,6 +34,15 @@ public class MainMenuController : MonoBehaviour
     void Start()
     {
         SetHighScore();
+    }
+
+    void Update()
+    {
+        if (_isLoading)
+            return;
+
+        if (Input.GetKeyDown(KeyCode.Space))
+            _startGameButton.onClick.Invoke();
     }
 
     void SetHighScore()

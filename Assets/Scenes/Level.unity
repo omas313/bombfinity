@@ -16699,7 +16699,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3414452988871198483, guid: 3d9879b1a584fe04e9a64c1db2c17083, type: 3}
       propertyPath: _maxHealth
-      value: 100
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3414452988871198487, guid: 3d9879b1a584fe04e9a64c1db2c17083, type: 3}
       propertyPath: m_Name
@@ -17626,7 +17626,7 @@ SpriteRenderer:
   m_SortingLayer: -2
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: d932a22d4f1cf274881da1c2e0c52f0a, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.9245283, g: 0.9245283, b: 0.9245283, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
