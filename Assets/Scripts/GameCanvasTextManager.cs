@@ -9,12 +9,14 @@ public class GameCanvasTextManager : MonoBehaviour
     public static GameCanvasTextManager Instance { get; private set;}
 
     [SerializeField] GameObject _instructions;
+    [SerializeField] GameObject _pauseMenu;
     [SerializeField] TextMeshProUGUI _youDiedText;
     [SerializeField] TextMeshProUGUI _scoreText;
     [SerializeField] TextMeshProUGUI _levelText;
     [SerializeField] PopUpTextPanel _popupLevelText;
 
     int _score;
+    bool _isPaused;
 
     public IEnumerator ShowPopup(string text)
     {
@@ -25,6 +27,11 @@ public class GameCanvasTextManager : MonoBehaviour
     {
         _score += level * 10;
         _scoreText.SetText(_score.ToString());
+    }
+
+    public void UpdateLevelText(int level)
+    {
+        _levelText.SetText(level.ToString());
     }
 
     void Awake()
@@ -47,10 +54,23 @@ public class GameCanvasTextManager : MonoBehaviour
         EnemyManager.Instance.EnemyDestroyed += OnEnemyDestroyed;   
     }
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            TogglePause();
+    }
+
+    void TogglePause()
+    {
+        _isPaused = !_isPaused;
+
+        _pauseMenu.SetActive(_isPaused);
+        Time.timeScale = _isPaused ? 0f : 1f;
+    }
+
     void OnPlayerReady()
     {
         _instructions.gameObject.SetActive(false);
-
     }
 
     void OnPlayerDied()

@@ -60,6 +60,7 @@ public class LevelManager : MonoBehaviour
     {
         LevelStarted?.Invoke(level);
         _isWaitingForLevelStart = false;
+        GameCanvasTextManager.Instance.UpdateLevelText(CurrentLevel);
         StartCoroutine(ShowUIAndSpawnEnemies(level));
     }
 
