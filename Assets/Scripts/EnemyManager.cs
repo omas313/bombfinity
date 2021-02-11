@@ -40,7 +40,7 @@ public class EnemyManager : MonoBehaviour
         var count = level + (int)Math.Floor(Math.Sqrt(level) * 0.25f);
 
         if (level <= 3)
-            count += 1;
+            count += UnityEngine.Random.Range(1, 3);
 
         StartCoroutine(SpawnEnemiesWithDelay(level, count));
     }

@@ -22,7 +22,8 @@ public class Island : MonoBehaviour, IHealth
 
     public void SetStats(int level)
     {
-        _currentHealth = _maxHealth = UnityEngine.Random.Range(1, level);
+        var minHealth = 1 + (int)Math.Sqrt(level);
+        _currentHealth = _maxHealth = UnityEngine.Random.Range(minHealth, (int)Math.Ceiling(minHealth * 1.5f));
         SpawnGuns(level);
     }
 
