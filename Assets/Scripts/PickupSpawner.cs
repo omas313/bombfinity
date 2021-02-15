@@ -47,11 +47,12 @@ public class PickupSpawner : MonoBehaviour
     {
         _timer = 0f;
         var pickupPrefab = GetRandomPickupPrefab();
-        if (UnityEngine.Random.value < pickupPrefab.ChanceToSpawn)
+        if (UnityEngine.Random.value > pickupPrefab.ChanceToSpawn)
             return;
 
         Pickup pickup = Instantiate(pickupPrefab, GetRandomPosition(), Quaternion.identity);
         PickupSpawned?.Invoke(pickup);
+        _spawnPeriod = UnityEngine.Random.Range(20f, 30f);
     }
 
     Vector3 GetRandomPosition() => new Vector3(

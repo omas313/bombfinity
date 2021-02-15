@@ -212,7 +212,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pickupText: Triple Bombs
   _pickupSoundClip: {fileID: 8300000, guid: 99b290fe90f641c44addd654c12e1271, type: 3}
-  _chanceToSpawn: 0.4
+  _chanceToSpawn: 0.8
   _lifetime: 6
   _bombPrefab: {fileID: 6748411844361947660, guid: 0b200e59c692c0a47ab1d91d93e0b627, type: 3}
   _offsetFromMainBomb: {x: 0.75, y: -0.5}

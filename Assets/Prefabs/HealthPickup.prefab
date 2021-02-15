@@ -4832,7 +4832,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6450646846828569781}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.71, y: 2.9, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7966330144392392176}
@@ -5016,6 +5016,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pickupText: '+3 Health '
   _pickupSoundClip: {fileID: 8300000, guid: c0c1a3586a067d841b0b7b757f1a5c1d, type: 3}
-  _chanceToSpawn: 0.8
+  _chanceToSpawn: 0.9
   _lifetime: 8
   _healthToAdd: 3
